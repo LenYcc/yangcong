@@ -13,6 +13,7 @@ package mysql
 import (
 	"database/sql"
 	"fmt"
+	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
 	"yangcong/config"
 )
@@ -24,19 +25,14 @@ type DBMysql struct {
 
 func NewMySqlConn(config config.MysqlConfig) *sql.DB{
 	//数据库连接
-	db,_:=sql.Open("mysql","root:root@(106.55.149.13:3306)/golang")
-	err :=db.Ping()
+	dataSourceName := config.DBUser + ":" + config.Password + "@tcp" + "(" + config.Host + ":" + config.Port + ")/" + config.DBName
+	fmt.Println(dataSourceName)
+	db1 := orm.RegisterDataBase("default", "mysql", dataSourceName)
+	db2,_:=sql.Open("mysql",dataSourceName)
+	err :=db2.Ping()
 	if err != nil{
 		fmt.Println("数据库链接失败")
 	}
-	defer db.Close()
-
-	//多行查询
-	rows,_:=db.Query("select * from stu")
-	var id,name string
-	for rows.Next(){
-		rows.Scan(&id,&name)
-		fmt.Println(id,name)
-	}
+	defer db2.Close()
 	return db
 }
