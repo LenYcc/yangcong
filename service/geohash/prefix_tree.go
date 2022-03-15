@@ -19,6 +19,7 @@ type PrefixTreeNode struct {
 	Depth int
 	IsEnd bool
 	Key string
+	bitmap *bitmap
 }
 
 type PrefixTree struct {
@@ -68,6 +69,9 @@ func (prefixTree PrefixTree) Insert(key string) {
 	}
 	node.IsEnd = true
 	node.Key = key
+	if node.bitmap == nil {
+		node.bitmap = BitMap[key]
+	}
 	//fmt.Println()
 }
 
@@ -97,9 +101,9 @@ func (prefixTree PrefixTree) StartsWith(prefix string) bool {
 }
 
 // 判断字典树中是否有指定前缀的单词
-func (prefixTree PrefixTree) GetStartsWith(prefix string)(result map[string]struct{}) {
+func (prefixTree PrefixTree) GetStartsWith(prefix string)(result map[string]*bitmap) {
 	node := prefixTree.Root
-	result = make(map[string]struct{})
+	result = make(map[string]*bitmap)
 	for i := 0; i < len(prefix); i++ {
 		_, ok := node.Children[prefix[i]]
 		if !ok {
@@ -126,7 +130,7 @@ func (prefixTree PrefixTree) GetStartsWith(prefix string)(result map[string]stru
 			}
 			if treeNode.IsEnd{
 				//fmt.Println(treeNode.IsEnd, treeNode.Key)
-				result[treeNode.Key] = struct{}{}
+				result[treeNode.Key] = treeNode.bitmap
 			}
 		}
 		queue = tmpQueue

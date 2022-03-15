@@ -8,6 +8,8 @@
 
 package geohash
 
+import "math/rand"
+
 //Latitude 维度
 //Longitude 经度
 const (
@@ -82,7 +84,7 @@ func (position Position) Delete(id int64) string {
 	return mapKey
 }
 
-func (position Position) Search(deep int) map[string]struct{} {
+func (position Position) Search(deep int) []int {
 	positionRange := &PositionRange{
 		MaxLat: MaxLat,
 		MinLat: MinLat,
@@ -98,8 +100,11 @@ func (position Position) Search(deep int) map[string]struct{} {
 	//fmt.Printf( "%b",positionRange.GeoHash)
 	mapKey := positionRange.EncodeBase32()
 	//fmt.Println(mapKey[0:deep])
-	return GetPrefixTree().GetStartsWith(mapKey[0:deep])
-	//fmt.Print(GetPrefixTree().StartsWith(mapKey))
+	result := []int{}
+	for _, bitMap := range GetPrefixTree().GetStartsWith(mapKey[0:deep]) {
+		result = append(result, bitMap.scan(rand.Intn(int(bitMap.len)), 2000)...)
+	}
+	return result
 }
 
 func (positionRange *PositionRange) MiddleCut(position Position) (*PositionRange, error)  {

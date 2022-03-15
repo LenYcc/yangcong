@@ -97,6 +97,18 @@ func (b *bitmap)scan(c int, limit int)(result []int) {
 	if c > b.len {
 		c = 0
 	}
+	if limit > b.len {
+		for i := 0;i < b.len; i++  {
+			for j := byte(0); j <= ByteSize; j ++ {
+				//fmt.Println(b.keys[i], 1 << j, b.keys[i] & byte(1 << j))
+				if b.keys[i] & byte(1 << j) != 0 {
+					result = append(result,  int(j) + i * ByteSize)
+					limit --
+				}
+			}
+		}
+		return
+	}
 	for i := c + 1;i != c ; i++ {
 		if i == b.len {
 			if c == 0 {

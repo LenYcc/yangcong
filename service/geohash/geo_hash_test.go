@@ -35,4 +35,5 @@ func TestGeoHash(t *testing.T) {
 	fmt.Println(position2.Search(4))
 	fmt.Println("======================================")
 	fmt.Println(position2.Search(1))
+
 }
