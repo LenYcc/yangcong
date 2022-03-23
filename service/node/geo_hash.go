@@ -6,7 +6,7 @@
  * @Date: 2022/01/24 2:03 上午
  */
 
-package geohash
+package node
 
 import "math/rand"
 
@@ -19,7 +19,6 @@ const (
 	MinLon = -180
 )
 
-const MaxDeep30 = 30 //GeoHash 最高长度是  60 / 5 = 12
 const MaxDeep20 = 20 //GeoHash 精度为米    8 * 5 = 40
 
 type PositionRange struct {

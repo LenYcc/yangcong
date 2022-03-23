@@ -10,7 +10,7 @@ package main
 
 import (
 	"net/http"
-	"yangcong/service/geohash/service"
+	"yangcong/service/node/service"
 )
 
 func main() {

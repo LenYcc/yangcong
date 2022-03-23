@@ -6,7 +6,7 @@
  * @Date: 2022/02/03 3:21 上午
  */
 
-package geohash
+package node
 
 import (
 	"fmt"
