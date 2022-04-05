@@ -36,7 +36,7 @@ type Position struct {
 
 var keyMap map[string]struct{}
 
-func (position Position) Insert(id int64) string {
+func (prefixTree PrefixTree) Insert(latitude, longitude float64, id int64) string {
 	positionRange := &PositionRange{
 		MaxLat: MaxLat,
 		MinLat: MinLat,
@@ -45,23 +45,28 @@ func (position Position) Insert(id int64) string {
 		GeoHash: make([]uint32, 0),
 	}
 
+
+
 	for i := 0; i < MaxDeep20; i++ {
-		positionRange.MiddleCut(position)
+		positionRange.MiddleCut(Position{
+			Latitude:  latitude,
+			Longitude: longitude,
+		})
 	}
 
 	//fmt.Printf( "%b",positionRange.GeoHash)
 	mapKey := positionRange.EncodeBase32()
-	if GetBitMap()[mapKey] != nil {
-		GetBitMap()[mapKey].set(id)
+	if prefixTree.GeoHashBitMap[mapKey] != nil {
+		prefixTree.GeoHashBitMap[mapKey].Set(id)
 	}else{
-		GetPrefixTree().Insert(mapKey)
-		GetBitMap()[mapKey].set(id)
+		prefixTree.InsertMapKey(mapKey)
+		prefixTree.GeoHashBitMap[mapKey].Set(id)
 	}
 	//fmt.Print(GetPrefixTree().StartsWith(mapKey))
 	return mapKey
 }
 
-func (position Position) Delete(id int64) string {
+func (prefixTree PrefixTree) Delete(latitude, longitude float64,id int64) string {
 	positionRange := &PositionRange{
 		MaxLat: MaxLat,
 		MinLat: MinLat,
@@ -71,19 +76,22 @@ func (position Position) Delete(id int64) string {
 	}
 
 	for i := 0; i < MaxDeep20; i++ {
-		positionRange.MiddleCut(position)
+		positionRange.MiddleCut(Position{
+			Latitude:  latitude,
+			Longitude: longitude,
+		})
 	}
 
 	//fmt.Printf( "%b",positionRange.GeoHash)
 	mapKey := positionRange.EncodeBase32()
-	if GetBitMap()[mapKey] != nil {
-		GetBitMap()[mapKey].del(id)
+	if prefixTree.GeoHashBitMap[mapKey] != nil {
+		prefixTree.GeoHashBitMap[mapKey].Del(id)
 	}
 	//fmt.Print(GetPrefixTree().StartsWith(mapKey))
 	return mapKey
 }
 
-func (position Position) Search(deep int) []int {
+func (prefixTree PrefixTree) Search(latitude, longitude float64,deep int) []int {
 	positionRange := &PositionRange{
 		MaxLat: MaxLat,
 		MinLat: MinLat,
@@ -93,15 +101,21 @@ func (position Position) Search(deep int) []int {
 	}
 
 	for i := 0; i < MaxDeep20; i++ {
-		positionRange.MiddleCut(position)
+		positionRange.MiddleCut(Position{
+			Latitude:  latitude,
+			Longitude: longitude,
+		})
 	}
 
 	//fmt.Printf( "%b",positionRange.GeoHash)
 	mapKey := positionRange.EncodeBase32()
 	//fmt.Println(mapKey[0:deep])
 	result := []int{}
-	for _, bitMap := range GetPrefixTree().GetStartsWith(mapKey[0:deep]) {
-		result = append(result, bitMap.scan(rand.Intn(int(bitMap.len)), 2000)...)
+	if deep >= len(mapKey) {
+		 deep = len(mapKey) - 1
+	}
+	for _, bitMap := range prefixTree.GetStartsWith(mapKey[0:deep]) {
+		result = append(result, bitMap.Scan(rand.Intn(int(bitMap.len)), 2000)...)
 	}
 	return result
 }
@@ -126,5 +140,3 @@ func (positionRange *PositionRange) MiddleCut(position Position) (*PositionRange
 
 	return positionRange, nil
 }
-
-//todo 持久化 插入 前缀树

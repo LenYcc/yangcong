@@ -19,11 +19,12 @@ type PrefixTreeNode struct {
 	Depth int
 	IsEnd bool
 	Key string
-	bitmap *bitmap
+	bitmap *BitMap
 }
 
 type PrefixTree struct {
 	Root *PrefixTreeNode
+	GeoHashBitMap GeoHashBitMap
 }
 
 func NewPrefixTree() *PrefixTree {
@@ -33,6 +34,7 @@ func NewPrefixTree() *PrefixTree {
 			Depth:      0,
 			IsEnd:      false,
 		},
+		GeoHashBitMap: make(GeoHashBitMap),
 	}
 }
 
@@ -44,18 +46,18 @@ func NewPrefixTreeNode() *PrefixTreeNode {
 	}
 }
 
-func init()  {
-	globalPrefixTree = NewPrefixTree()
-}
+//func init()  {
+//	globalPrefixTree = NewPrefixTree()
+//}
+//
+//func GetPrefixTree() *PrefixTree {
+//	return globalPrefixTree
+//}
 
-func GetPrefixTree() *PrefixTree {
-	return globalPrefixTree
-}
-
-func (prefixTree PrefixTree) Insert(key string) {
-	_, OK := BitMap[key]
-	if !OK {
-		BitMap[key] = NewBitMap()
+func (prefixTree PrefixTree) InsertMapKey(key string) {
+	v := prefixTree.GeoHashBitMap[key]
+	if v == nil {
+		prefixTree.GeoHashBitMap[key] = NewBitMap()
 	}
 	node := prefixTree.Root
 	for i := 0 ;i< len(key);i++ {
@@ -70,22 +72,25 @@ func (prefixTree PrefixTree) Insert(key string) {
 	node.IsEnd = true
 	node.Key = key
 	if node.bitmap == nil {
-		node.bitmap = BitMap[key]
+		node.bitmap = prefixTree.GeoHashBitMap[key]
 	}
 	//fmt.Println()
 }
 
-func (prefixTree PrefixTree) Search(key string) bool {
-	node := prefixTree.Root
-	for i := 0; i < len(key); i++ {
-		_, ok := node.Children[key[i]]
-		if !ok {
-			return false
-		}
-		node = node.Children[key[i]]
-	}
-	return false
-}
+//func (prefixTree PrefixTree) SearchKey(key string) *BitMap {
+//	node := prefixTree.Root
+//	for i := 0; i < len(key); i++ {
+//		_, ok := node.Children[key[i]]
+//		if !ok {
+//			return nil
+//		}
+//		node = node.Children[key[i]]
+//	}
+//	if node.IsEnd && node.bitmap != nil {
+//		return node.bitmap
+//	}
+//	return nil
+//}
 
 // 判断字典树中是否有指定前缀的单词
 func (prefixTree PrefixTree) StartsWith(prefix string) bool {
@@ -101,9 +106,9 @@ func (prefixTree PrefixTree) StartsWith(prefix string) bool {
 }
 
 // 判断字典树中是否有指定前缀的单词
-func (prefixTree PrefixTree) GetStartsWith(prefix string)(result map[string]*bitmap) {
+func (prefixTree PrefixTree) GetStartsWith(prefix string)(result map[string]*BitMap) {
 	node := prefixTree.Root
-	result = make(map[string]*bitmap)
+	result = make(map[string]*BitMap)
 	for i := 0; i < len(prefix); i++ {
 		_, ok := node.Children[prefix[i]]
 		if !ok {

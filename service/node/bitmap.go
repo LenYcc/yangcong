@@ -1,7 +1,7 @@
 /**
  * @Author: dengmingcong
  * @Description:
- * @File:  bitmap
+ * @File:  BitMap
  * @Version: 1.0.0
  * @Date: 2022/02/03 3:21 上午
  */
@@ -15,30 +15,30 @@ import (
 
 var onceBitMap sync.Once
 
-var BitMap map[string]*bitmap
+type GeoHashBitMap map[string]*BitMap
 
-type bitmap struct {
+type BitMap struct {
 	keys []byte
 	len int
 }
 
 const ByteSize = 8
 
-func init() {
-	onceBitMap.Do(func() {
-		BitMap = make(map[string]*bitmap)
-	})
+//func init() {
+//	onceBitMap.Do(func() {
+//		BitMap = make(map[string]*BitMap)
+//	})
+//}
+//
+//func GetBitMap() map[string]*BitMap {
+//	return BitMap
+//}
+
+func NewBitMap() *BitMap {
+	return &BitMap{keys:make([]byte, 0), len:0}
 }
 
-func GetBitMap() map[string]*bitmap {
-	return BitMap
-}
-
-func NewBitMap() *bitmap {
-	return &bitmap{keys:make([]byte, 0), len:0}
-}
-
-func (b *bitmap)has(v int64) bool {
+func (b *BitMap)Has(v int64) bool {
 
 	if b.len == 0 {
 		return false
@@ -58,7 +58,7 @@ func (b *bitmap)has(v int64) bool {
 	return false
 }
 
-func (b *bitmap)set(v int64) {
+func (b *BitMap)Set(v int64) {
 
 	index := v / 8
 
@@ -74,7 +74,7 @@ func (b *bitmap)set(v int64) {
 	b.keys[index] =b.keys[index] | (1 << byteIndex)
 }
 
-func (b *bitmap)del(v int64) {
+func (b *BitMap)Del(v int64) {
 
 	index := v / 8
 
@@ -90,7 +90,7 @@ func (b *bitmap)del(v int64) {
 	b.keys[index] =b.keys[index] | (0 << byteIndex)
 }
 
-func (b *bitmap)scan(c int, limit int)(result []int) {
+func (b *BitMap)Scan(c int, limit int)(result []int) {
 	if b.len == 0 {
 		return result
 	}
@@ -133,11 +133,11 @@ func (b *bitmap)scan(c int, limit int)(result []int) {
 	return
 }
 
-func (b *bitmap)length()int {
+func (b *BitMap)Length()int {
 	return b.len
 }
 
-func (b *bitmap)print() {
+func (b *BitMap)Print() {
 	for _, v :=range b.keys {
 		fmt.Printf("%08b\n", v)
 	}

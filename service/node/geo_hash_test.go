@@ -14,26 +14,19 @@ import (
 )
 
 func TestGeoHash(t *testing.T) {
-	position1 := Position{
-		Latitude:  39.901136325561474,
-		Longitude: 116.68228026611021,
-	}
-	key := position1.Insert(10)
-	fmt.Println(key)
-	position2 := Position{
-		Latitude:  39.90113632516148,
-		Longitude: 116.68230367445747,
-	}
-	key = position2.Insert(20)
-	fmt.Println(key)
-	position3 := Position{
-		Latitude:  40.90113632516148,
-		Longitude: 116.68230367445747,
-	}
-	key = position3.Insert(30)
-	fmt.Println(key)
-	fmt.Println(position2.Search(4))
-	fmt.Println("======================================")
-	fmt.Println(position2.Search(1))
+	//position1 := Position{
+	//	Latitude:  39.901136325561474,
+	//	Longitude: 116.68228026611021,
+	//}
+	tree := NewPrefixTree()
+	tree.Insert(39.90113632516148,116.68230367445747,  10)
+	tree.Insert(39.90113632516148,116.68230367445747,  101)
+	tree.Insert(39.90113632516148,116.68230367445747,  102)
+	tree.Insert(39.90113632516148,116.68230367445747,  103)
+	tree.Insert(39.90113632516148,116.68230367445747,  104)
+	tree.Insert(39.90113632516148,116.68230367445747,  105)
+	tree.Insert(39.90113632516148,116.68230367445747,  106)
+	tree.Insert(-39.90113632516148,116.68230367445747,  109)
+	fmt.Println(tree.Search(39.90113632516148,116.68230367445747,0))
 
 }
