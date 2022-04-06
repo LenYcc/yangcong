@@ -181,7 +181,7 @@ func TestNewMySqlConn2(t *testing.T) {
 			fmt.Println(err)
 		}
 		telMap[fmt.Sprint(user2.Tel)] = true
-		//fmt.Println(user2.Tel)
+		fmt.Println(user2.Tel)
 	}
 	//for s, b := range telMap {
 	//	fmt.Println(s,b)
