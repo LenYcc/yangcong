@@ -15,7 +15,7 @@ import (
 	"time"
 	config2 "yangcong/config"
 	"yangcong/modules/mysql"
-	"yangcong/service/node"
+	"yangcong/service/user/dto"
 )
 
 func TestName(t *testing.T) {
@@ -50,7 +50,7 @@ func TestNewMySqlConn1(t *testing.T) {
 	//}
 	telMap := make(map[string]bool)
 	rows, _ := db.Query("select * from user")
-	user2 := node.User{}
+	user2 := dto.User{}
 	for rows.Next() {
 		err := rows.Scan(&user2.UserId, &user2.Gender, &user2.Tel, &user2.Name, &user2.Birthdate, &user2.X, &user2.Y, &user2.Pop, &user2.HeadImg,
 			&user2.Country, &user2.City, &user2.Tags, &user2.CreateTime, &user2.UpdateTime)
@@ -173,7 +173,7 @@ func TestNewMySqlConn2(t *testing.T) {
 	//}
 	telMap := make(map[string]bool)
 	rows, _ := db.Query("select * from user")
-	user2 := node.User{}
+	user2 := dto.User{}
 	for rows.Next() {
 		err := rows.Scan(&user2.UserId, &user2.Gender, &user2.Tel, &user2.Name, &user2.Birthdate, &user2.X, &user2.Y, &user2.Pop, &user2.HeadImg,
 			&user2.Country, &user2.City, &user2.Tags, &user2.CreateTime, &user2.UpdateTime)
