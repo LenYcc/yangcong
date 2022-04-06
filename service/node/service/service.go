@@ -11,11 +11,11 @@ package service
 import (
 	"database/sql"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"yangcong/config"
 	"yangcong/modules/mysql"
 	"yangcong/service/node"
+	"yangcong/service/node/dto"
 )
 
 type NodeServiceHandler struct {
@@ -30,7 +30,7 @@ func NewNodeServer() *NodeServiceHandler {
 	mysqlConfig := config.MysqlConfig{
 		Host:     "106.55.149.13",
 		Port:     "3306",
-		DBName:   "test", //todo 修改数据库名字
+		DBName:   "yangcong", //todo 修改数据库名字
 		DBUser:   "root",
 		Password: "Dmc362@@",
 		Timeout:  0,
@@ -42,24 +42,75 @@ func NewNodeServer() *NodeServiceHandler {
 		fmt.Errorf("初始化 Mysql 失败:ERROR:%v", err)
 		return nil
 	}
-
+	fmt.Println(nodeServiceHandler.MySqlDB , "------------")
 	//初始化 GeoHashMap
 	nodeServiceHandler.GeoHash = node.NewPrefixTree()
-
+	fmt.Println(nodeServiceHandler.GeoHash, "------------")
 	//初始化 UserTags
 	nodeServiceHandler.UserTags = node.NewUserTags("User", nodeServiceHandler.MySqlDB)
+	fmt.Println(nodeServiceHandler.UserTags, "------------")
 	//读取 mysql 数据构建索引
-	nodeServiceHandler.UserTags.RunSchedulerJob()
-
-
-
+	go func() {
+		nodeServiceHandler.UserTags.RunSchedulerJob(nodeServiceHandler.GeoHash)
+	}()
+	fmt.Println("服务初始化完成，正在读取用户数据。。。。。")
 	return nodeServiceHandler
 }
 
 
-func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "测试路径,表示程序开始")
+func (nodeServiceHandler NodeServiceHandler) SearchHttp(w http.ResponseWriter, r *http.Request) {
+	reply := nodeServiceHandler.Search(dto.SearchRequest{
+		UserId: 1,
+		Radius: 78,
+		Gender: 1,
+		X:      116.397,
+		Y:      39.9165,
+	})
+	for _, user := range reply.Users {
+		fmt.Fprintln(w, user.UserId)
+		fmt.Fprintln(w, user.Tags)
+		fmt.Fprintln(w, user.Gender)
+		fmt.Fprintln(w, user.Pop)
+		fmt.Fprintln(w, user.Distance)
+	}
+
 }
+
+func (nodeServiceHandler NodeServiceHandler) Search(request dto.SearchRequest) dto.SearchReply {
+	//解析 deep
+	deep := ParserRadius(request.Radius)
+	fmt.Println("deep",deep)
+	ids := nodeServiceHandler.GeoHash.Search(request.X, request.Y, deep)
+	//TODO 获取过滤列表
+
+	//TODO 拿取用户信息
+	reply := dto.SearchReply{}
+	reply.Users = []*dto.User{}
+	for _, id := range ids {
+		user := nodeServiceHandler.UserTags.Get(int64(id))
+		if user != nil {
+			reply.Users = append(reply.Users, user)
+		}
+	}
+	return reply
+}
+
+func ParserRadius(radius int64) (deep int) {
+	switch radius {
+	case 1:
+		deep = 5
+	case 20:
+		deep = 4
+	case 78:
+		deep = 3
+	case 500:
+		deep = 2
+	default:
+		deep = 3
+	}
+	return deep
+}
+
 
 //func GeoHashSetHandler(w http.ResponseWriter, r *http.Request) {
 //	fmt.Fprintln(w, r.Header)

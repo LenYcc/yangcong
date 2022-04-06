@@ -8,7 +8,9 @@
 
 package node
 
-import "math/rand"
+import (
+	"math/rand"
+)
 
 //Latitude 维度
 //Longitude 经度

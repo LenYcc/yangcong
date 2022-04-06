@@ -14,6 +14,7 @@ func (positionRange PositionRange) EncodeBase32() string {
 	result := ""
 	length := len(positionRange.GeoHash)
 	//fmt.Println(length)
+	x := 0
 	for i := 0;i < length; i += 5 {
 		var index uint32
 		//fmt.Printf("%d:\n", i)
@@ -30,8 +31,12 @@ func (positionRange PositionRange) EncodeBase32() string {
 			index = index >> 1
 			//fmt.Printf("%b\n", index)
 		}
+		x ++
 		//fmt.Println(" ")
 		result += string(GeoHashIndex[index])
+		if x >= 6 {
+			break
+		}
 	}
 	//fmt.Println(result)
 	return result

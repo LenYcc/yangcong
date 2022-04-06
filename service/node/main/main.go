@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/", service.IndexHandler)
-	http.HandleFunc("/search", service.GeoHashSetHandler)
+	server := service.NewNodeServer()
+	http.HandleFunc("/search", server.SearchHttp)
 	http.ListenAndServe("127.0.0.1:8001", nil)
 }

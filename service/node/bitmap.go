@@ -35,7 +35,7 @@ const ByteSize = 8
 //}
 
 func NewBitMap() *BitMap {
-	return &BitMap{keys:make([]byte, 0), len:0}
+	return &BitMap{keys:make([]byte, 2500000), len:2500000}
 }
 
 func (b *BitMap)Has(v int64) bool {
@@ -49,6 +49,7 @@ func (b *BitMap)Has(v int64) bool {
 	byteIndex :=byte(v % 8)
 
 	if int(index) >len(b.keys) { //todo not exist
+		fmt.Println("len(b.keys)", len(b.keys))
 		return false
 	}
 
