@@ -28,7 +28,7 @@ func NewNodeServer() *NodeServiceHandler {
 	nodeServiceHandler := &NodeServiceHandler{}
 	//初始化 Mysql
 	mysqlConfig := config.MysqlConfig{
-		Host:     "106.55.149.13",
+		Host:     "81.68.70.6",
 		Port:     "3306",
 		DBName:   "yangcong", //todo 修改数据库名字
 		DBUser:   "root",
