@@ -35,7 +35,7 @@ const ByteSize = 8
 //}
 
 func NewBitMap() *BitMap {
-	return &BitMap{keys:make([]byte, 2500000), len:2500000}
+	return &BitMap{keys:make([]byte, 50000), len:50000}
 }
 
 func (b *BitMap)Has(v int64) bool {
