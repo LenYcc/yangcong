@@ -16,5 +16,5 @@ import (
 func main() {
 	server := service.NewNodeServer()
 	http.HandleFunc("/search", server.SearchHttp)
-	http.ListenAndServe("127.0.0.1:8001", nil)
+	http.ListenAndServe("0.0.0.0:8001", nil)
 }
