@@ -11,9 +11,11 @@ package service
 import (
 	"database/sql"
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
+	"os"
 	"strconv"
-	"strings"
 	"time"
 	"yangcong/config"
 	"yangcong/modules/mysql"
@@ -38,14 +40,23 @@ const (
 type UserServiceHandler struct {
 	MySqlDB *sql.DB
 	TagsMap map[string]int
+	Logger log.Logger
 }
 
 func NewUserServer() *UserServiceHandler {
 	userServiceHandler := &UserServiceHandler{}
+
+	logFile, errOpen := os.OpenFile("./user.log-" + time.Now().Format("2006-01-02"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	if errOpen != nil {
+		fmt.Errorf("Open file err, %v", errOpen)
+	}
+	userServiceHandler.Logger.SetOutput(logFile)
+	userServiceHandler.Logger.SetFlags(log.Llongfile | log.Lmicroseconds | log.Ldate)
+	userServiceHandler.Logger.Println("服务开始启动。")
 	//初始化 Mysql
 	mysqlConfig := config.MysqlConfig{
-		Host: "81.68.70.6",
-		//Host:     "106.55.149.13",
+		//Host: "81.68.70.6",
+		Host:     "106.55.149.13",
 		Port:     "3306",
 		DBName:   "yangcong", //todo 修改数据库名字
 		DBUser:   "root",
@@ -76,104 +87,196 @@ func NewUserServer() *UserServiceHandler {
 	return userServiceHandler
 }
 
-func (userServiceHandler UserServiceHandler) Register(w http.ResponseWriter, r *http.Request) {
-
+func (userServiceHandler UserServiceHandler) Register(c *gin.Context) {
 	success := true
 	user := dto.User{}
 	tx, _ := userServiceHandler.MySqlDB.Begin()
-	
+
+	if c.PostForm("name") != "" {
+		user.Name = c.PostForm("name")
+	}else {
+		c.String(http.StatusBadRequest, "message" + ":" + "请输入正确的姓名。")
+		success = false
+	}
+
 	gender := 0
-	if r.PostForm.Get("gender") == "male" {
+	if c.PostForm("gender") == "male" {
 		gender = 1
-	}else if r.PostForm.Get("gender") == "female" {
+	}else if c.PostForm("gender") == "female" {
 		gender = 0
 	}else {
-		w.Write([]byte("请输入正确的性别。"))
+		c.String(http.StatusBadRequest, "message" + ":" + "请输入正确的性别。")
 		success = false
 	}
 	user.Gender = gender
+	fmt.Println(gender)
 
-	telString := r.PostForm.Get("tel")
+	telString := c.PostForm("tel")
+	fmt.Println(telString)
 	tel , err := strconv.Atoi(telString)
 	if err != nil || len(telString) != 11 {
-		w.Write([]byte("请输入正确的电话号码。"))
+		c.String(http.StatusBadRequest, fmt.Sprint(gin.H{"message":"请输入正确的电话号码。"}))
 		success = false
 	}
 	user.Tel = int64(tel)
 
-	birthdateString := r.PostForm.Get("tel")
+	birthdateString := c.PostForm("birthdate")
 	birthdate , err := strconv.Atoi(birthdateString)
 	if err != nil {
-		w.Write([]byte("请输入正确生日。"))
+		c.String(http.StatusBadRequest, fmt.Sprint(gin.H{"message":"请输入正确生日。"}))
 		success = false
 	}
 	user.Birthdate = time.Unix(int64(birthdate),0).Format("2006-01-02 03:04:05")
 
-	XString := r.PostForm.Get("X")
+	XString := c.PostForm("X")
 	X , err := strconv.ParseFloat(XString, 64)
 	if err != nil {
-		w.Write([]byte("坐标错误。"))
+		c.String(http.StatusBadRequest, fmt.Sprint(gin.H{"message":"坐标错误。"}))
 		success = false
 	}
 	user.X = X
 
-	YString := r.PostForm.Get("Y")
+	YString := c.PostForm("Y")
 	Y , err := strconv.ParseFloat(YString, 64)
 	if err != nil {
-		w.Write([]byte("坐标错误。"))
+		c.String(http.StatusBadRequest, fmt.Sprint(gin.H{"message":"坐标错误。"}))
 		success = false
 	}
 	user.Y = Y
 
-	countryString := r.PostForm.Get("country")
+	countryString := c.PostForm("country")
 	country, err := strconv.Atoi(countryString)
 	if err != nil {
-		w.Write([]byte("请输入正确国家。"))
+		c.String(http.StatusBadRequest, fmt.Sprint(gin.H{"message":"请输入正确国家。"}))
 		success = false
 	}
 	user.Country = country
 
-	cityString := r.PostForm.Get("city")
+	cityString := c.PostForm("city")
 	city, err := strconv.Atoi(cityString)
 	if err != nil {
-		w.Write([]byte("请输入正确城市。"))
+		c.String(http.StatusBadRequest, fmt.Sprint(gin.H{"message":"请输入正确城市。"}))
 		success = false
 	}
 	user.City = city
 
-	tagsString := r.PostForm.Get("tags")
-	tags := strings.Split(tagsString, "/")
-	tagsInts := ""
-	for _, tag := range tags {
-		if v, ok := userServiceHandler.TagsMap[tag];ok {
-			tagsInts += fmt.Sprint(v) + "/"
-		}
-	}
-	if len(tagsInts) > 0 {
-		tagsInts = tagsInts[0:len(tagsInts) - 1]
-		user.Tags = tagsInts
+	tagsString := c.PostForm("tags")
+	if tagsString != "" {
+		user.Tags = tagsString
 	}else{
-		w.Write([]byte("请输入标签。"))
+		c.String(http.StatusBadRequest, fmt.Sprint(gin.H{"message":"请输入标签。"}))
 		success = false
 	}
-
 	user.Pop = 0
 
-	fmt.Println(tx.Query(fmt.Sprintf("INSERT INTO user (gender,tel, name, birthdate, x, y, pop, country, city, tags )VALUES(  '%v', '%v', '%v', '%v', '%v', '%v', '%v', '%v', '%v', '%v' );",
-		user.Gender, user.Tel, user.Name, user.Birthdate, user.X, user.Y, user.Pop,
-		user.Country, user.City, user.Tags)))
-	tx.Commit()
-
 	if success {
-		w.Write([]byte("注册成功。"))
+		fmt.Println(tx.Query(fmt.Sprintf("INSERT INTO user (gender,tel, name, birthdate, x, y, pop, country, city, tags )VALUES(  '%v', '%v', '%v', '%v', '%v', '%v', '%v', '%v', '%v', '%v' );",
+			user.Gender, user.Tel, user.Name, user.Birthdate, user.X, user.Y, user.Pop,
+			user.Country, user.City, user.Tags)))
+		tx.Commit()
+		c.String(http.StatusOK, fmt.Sprint(gin.H{"message":"注册成功。"}))
+		userServiceHandler.Logger.Println("注册了一个用户：id 为 ： %v", user.UserId)
 	}
 	return
 }
 
-func (userServiceHandler UserServiceHandler) Update(w http.ResponseWriter, r *http.Request) {
+func (userServiceHandler UserServiceHandler) Update(c *gin.Context) {
+	doUpdate := false
+	user := dto.User{}
 
+	tx, _ := userServiceHandler.MySqlDB.Begin()
+	userId := c.PostForm("userId")
+	if userId != "" {
+		rows, err := tx.Query(fmt.Sprintf("SELECT * FROM user where user_id = '%v';", userId))
+		if err != nil {
+			userServiceHandler.Logger.Fatalf("sql err ,%v ", err)
+		}else{
+			for rows.Next() {
+				errScan := rows.Scan(&user.UserId, &user.Gender, &user.Tel, &user.Name, &user.Birthdate, &user.X, &user.Y, &user.Pop, &user.HeadImg,
+					&user.Country, &user.City, &user.Tags, &user.CreateTime, &user.UpdateTime)
+				if err != nil {
+					userServiceHandler.Logger.Fatalf("sql Scan err %v",errScan)
+				}
+			}
+		}	
+	}else {
+		userServiceHandler.Logger.Fatalf("request err ,no user id")
+	}
+	
+
+	if value := c.PostForm("name"); value != "" && value != user.Name  {
+		user.Name = c.PostForm("name")
+		doUpdate = true
+	}
+
+	gender := -1
+	if c.PostForm("gender") == "male" {
+		gender = 1
+	}else if c.PostForm("gender") == "female" {
+		gender = 0
+	}
+	if gender != user.Gender && gender != -1{
+		user.Gender = gender
+		doUpdate = true
+	}
+
+	telString := c.PostForm("tel")
+	tel , err := strconv.Atoi(telString)
+	if err == nil || len(telString) == 11 {
+		if int64(tel) != user.Tel {
+			user.Tel = int64(tel)
+			doUpdate = true
+		}
+	}
+
+	birthdateString := c.PostForm("birthdate")
+	birthdate , err := strconv.Atoi(birthdateString)
+	if err == nil {
+		if value := time.Unix(int64(birthdate),0).Format("2006-01-02 03:04:05");value != "" && value != user.Birthdate {
+			user.Birthdate = value
+			doUpdate = true
+		}
+	}
+
+	countryString := c.PostForm("country")
+	if countryString != ""{
+		country, err := strconv.Atoi(countryString)
+		if err == nil {
+			if country != user.Country {
+				user.Country = country
+				doUpdate = true
+			}
+		}
+	}
+
+	cityString := c.PostForm("city")
+	if cityString != "" {
+		city, err := strconv.Atoi(cityString)
+		if err == nil {
+			if city != user.City {
+				user.City = city
+				doUpdate = true
+			}
+		}
+	}
+
+	tagsString := c.PostForm("tags")
+	if tagsString != "" && tagsString != user.Tags{
+		user.Tags = tagsString
+		doUpdate = true
+	}
+
+	if doUpdate {
+		fmt.Println(tx.Query(fmt.Sprintf("UPDATE user SET gender = '%v' , tel = '%v', name = '%v', birthdate = '%v', country = '%v', city = '%v', tags = '%v' WHERE user_id = '%v';",
+			user.Gender, user.Tel, user.Name, user.Birthdate,
+			user.Country, user.City, user.Tags, user.UserId)))
+		tx.Commit()
+		c.String(http.StatusOK, fmt.Sprint(gin.H{"message":"更新成功。"}))
+		userServiceHandler.Logger.Println("更新用户", userId)
+	}
+	return
 }
 
-func (userServiceHandler UserServiceHandler) Login(w http.ResponseWriter, r *http.Request) {
+func (userServiceHandler UserServiceHandler) Login(c *gin.Context) {
 
 }

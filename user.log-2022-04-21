@@ -1,0 +1,9 @@
+2022/04/21 21:00:20.051278 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:55: 这是一条很普通的日志。
+[PS]2022/04/21 21:00:20.051362 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:57: 这是一条很普通的日志。
+[PS]2022/04/21 21:00:20.051375 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:58: dqwewe
+2022/04/21 21:28:26.902687 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:55: 服务开始启动。
+2022/04/21 21:28:38.741451 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:275: 更新用户:%v 1
+2022/04/21 21:29:41.664507 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:55: 服务开始启动。
+2022/04/21 21:29:44.395155 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:275: 更新用户:%v 1
+2022/04/21 21:30:07.645069 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:275: 更新用户:%v 1
+2022/04/21 21:30:27.705159 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:275: 更新用户:%v 1
