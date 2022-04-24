@@ -230,9 +230,11 @@ func TestNewMySqlConn2(t *testing.T) {
 			}
 		}
 
+
 		tag = tag[0 : len(tag)-1]
 
 		user2.Tags = tag
+		fmt.Println(tag)
 
 		//fmt.Printf("INSERT INTO table_name ( user_id, gender,tel, name, birthdate, x, y, pop, head_img, country, city, tags )VALUES( '%v', '%v', '%v', '%v', '%v', '%v', '%v', '%v', '%v', '%v', '%v', '%v' );\n",
 		//	user2.UserId, user2.Gender, user2.Tel, user2.Name, user2.Birthdate, user2.X, user2.Y, user2.Pop, user2.HeadImg,

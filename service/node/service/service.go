@@ -62,7 +62,7 @@ func NewNodeServer() *NodeServiceHandler {
 func (nodeServiceHandler NodeServiceHandler) SearchHttp(w http.ResponseWriter, r *http.Request) {
 	reply := nodeServiceHandler.Search(dto.SearchRequest{
 		UserId: 1,
-		Radius: 78,
+		Radius: 15,
 		Gender: 1,
 		X:      116.397,
 		Y:      39.9165,

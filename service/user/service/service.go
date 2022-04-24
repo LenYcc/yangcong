@@ -11,6 +11,7 @@ package service
 import (
 	"database/sql"
 	"fmt"
+	"github.com/Shopify/sarama"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -41,10 +42,12 @@ type UserServiceHandler struct {
 	MySqlDB *sql.DB
 	TagsMap map[string]int
 	Logger log.Logger
+	KafkaProducerClient sarama.SyncProducer
 }
 
 func NewUserServer() *UserServiceHandler {
 	userServiceHandler := &UserServiceHandler{}
+	var err error
 
 	logFile, errOpen := os.OpenFile("./user.log-" + time.Now().Format("2006-01-02"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if errOpen != nil {
@@ -54,6 +57,7 @@ func NewUserServer() *UserServiceHandler {
 	userServiceHandler.Logger.SetFlags(log.Llongfile | log.Lmicroseconds | log.Ldate)
 	userServiceHandler.Logger.Println("服务开始启动。")
 	//初始化 Mysql
+	userServiceHandler.Logger.Println("初始化 mysql。")
 	mysqlConfig := config.MysqlConfig{
 		//Host: "81.68.70.6",
 		Host:     "106.55.149.13",
@@ -64,7 +68,30 @@ func NewUserServer() *UserServiceHandler {
 		Timeout:  0,
 		SSLMode:  "",
 	}
-	var err error
+
+	userServiceHandler.Logger.Println("初始化 kafka。")
+	config := sarama.NewConfig()
+	config.Producer.RequiredAcks = sarama.WaitForAll          // 发送完数据需要leader和follow都确认
+	config.Producer.Partitioner = sarama.NewRandomPartitioner // 新选出一个partition
+	config.Producer.Return.Successes = true                   // 成功交付的消息将在success channel返回
+
+	// 构造一个消息
+	msg := &sarama.ProducerMessage{}
+	msg.Topic = "test"
+	msg.Value = sarama.StringEncoder("this is a test log")
+	// 连接kafka
+	client, err := sarama.NewSyncProducer([]string{"81.68.70.6:9092"}, config)
+	if err != nil {
+		fmt.Println("producer closed, err:", err)
+	}
+	// 发送消息
+	pid, offset, err := client.SendMessage(msg)
+	if err != nil {
+		fmt.Println("send msg failed, err:", err)
+	}
+	fmt.Printf("pid:%v offset:%v\n", pid, offset)
+
+
 	userServiceHandler.MySqlDB, err = mysql.NewMySqlConn(mysqlConfig)
 	if err != nil {
 		fmt.Errorf("初始化 Mysql 失败:ERROR:%v", err)
@@ -280,3 +307,5 @@ func (userServiceHandler UserServiceHandler) Update(c *gin.Context) {
 func (userServiceHandler UserServiceHandler) Login(c *gin.Context) {
 
 }
+
+

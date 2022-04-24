@@ -1,0 +1,15 @@
+2022/04/23 01:28:57.935780 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:58: 服务开始启动。
+2022/04/23 01:28:57.935852 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:60: 初始化 mysql。
+2022/04/23 01:28:57.935868 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:72: 初始化 kafka。
+2022/04/23 01:29:24.281162 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:58: 服务开始启动。
+2022/04/23 01:29:24.281448 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:60: 初始化 mysql。
+2022/04/23 01:29:24.281476 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:72: 初始化 kafka。
+2022/04/23 01:29:35.362561 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:58: 服务开始启动。
+2022/04/23 01:29:35.362612 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:60: 初始化 mysql。
+2022/04/23 01:29:35.362622 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:72: 初始化 kafka。
+2022/04/23 01:38:23.577026 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:58: 服务开始启动。
+2022/04/23 01:38:23.577495 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:60: 初始化 mysql。
+2022/04/23 01:38:23.577518 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:72: 初始化 kafka。
+2022/04/23 01:38:33.456263 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:58: 服务开始启动。
+2022/04/23 01:38:33.456327 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:60: 初始化 mysql。
+2022/04/23 01:38:33.456344 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:72: 初始化 kafka。

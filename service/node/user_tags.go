@@ -59,9 +59,6 @@ func (cache *UserTags) refresh(prefixTree *PrefixTree) error {
 				fmt.Println("ID",user.UserId)
 				logTime = true
 			}
-			if user.UserId > 100000  {
-				break
-			}
 			Time := 0
 			if logTime {
 				fmt.Println("Begin",Time)
