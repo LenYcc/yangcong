@@ -18,13 +18,14 @@ type SearchRequest struct {
 
 type SearchReply struct {
 	Users []*User
+	Me   *User
 }
 
 type User struct {
 	UserId   int64
 	Pop      float64
 	Gender   int32
-	Tags     []int32
+	Tags     uint16
 	Distance float64
 }
 

@@ -147,7 +147,7 @@ func (cache *UserTags) Get(id int64 ) *dto2.User {
 	user  := &dto2.User{
 		UserId:     id,
 		Pop:        0,
-		Tags:       nil,
+		Tags:       0,
 	}
 	if cache.Gender[1].Has(id) {
 		user.Gender = 1
@@ -166,7 +166,7 @@ func (cache *UserTags) Get(id int64 ) *dto2.User {
 	}
 	for enum, bitMap := range cache.Tags {
 		if bitMap.Has(id) {
-			user.Tags = append(user.Tags, int32(enum))
+			user.Tags = user.Tags | 1 << enum
 		}
 	}
 	return user
