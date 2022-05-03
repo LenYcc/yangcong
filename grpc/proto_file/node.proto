@@ -1,0 +1,33 @@
+syntax = "proto3";
+package node;
+
+service NodeService{
+  rpc Recall (RecallRequest) returns (RecallReply);
+}
+
+message RecallRequest {
+  int32 UserId = 1;
+  float X = 2;
+  float Y = 3;
+  int32 Gender = 4;
+  int32 Radius = 5;
+}
+
+message RecallReply {
+  repeated User Users = 1;
+  User Me = 2;
+  Meta Meta = 3;
+}
+
+message User {
+  int32 UserId = 1;
+  uint32 Tags = 2;
+  int32 Gender = 3;
+  float Pop = 4;
+  float Distance = 5;
+}
+
+message Meta {
+  string Code = 1;
+  string Message = 2;
+}
