@@ -33,9 +33,9 @@ type MysqlConfig struct {
 }
 
 type RedisConfig struct {
-	Mode string
-	Host []string
-	DB string
+	Type string
+	Host string
+	Port string
 }
 
 //type KafkaConfig struct {

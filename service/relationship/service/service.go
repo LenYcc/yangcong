@@ -8,6 +8,21 @@
 
 package service
 
-func NewRelationShipService()  {
-	return
+import (
+	"yangcong/config"
+	"yangcong/modules/redis"
+)
+
+type RelationshipServer struct {
+
+}
+
+func NewRelationShipService()(*RelationshipServer)  {
+	redisConfig := config.RedisConfig{
+		Type: "tcp",
+		Host: "127.0.0.1",
+		Port: "3306",
+	}
+	conn := redis.NewRedisClient(redisConfig)
+	return nil
 }
