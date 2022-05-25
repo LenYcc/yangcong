@@ -1,0 +1,7 @@
+2022/05/18 01:23:39.377811 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:58: 服务开始启动。
+2022/05/18 01:23:39.377916 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:60: 初始化 mysql。
+2022/05/18 01:23:39.377931 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:72: 初始化 kafka。
+2022/05/18 01:24:53.562828 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:58: 服务开始启动。
+2022/05/18 01:24:53.563102 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:60: 初始化 mysql。
+2022/05/18 01:24:53.563130 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:72: 初始化 kafka。
+2022/05/18 01:25:12.626973 /Users/dengmingcong/go/src/yangcong/service/user/service/service.go:205: 注册了一个用户：id 为 ： %v 0

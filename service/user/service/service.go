@@ -79,17 +79,17 @@ func NewUserServer() *UserServiceHandler {
 	msg := &sarama.ProducerMessage{}
 	msg.Topic = "test"
 	msg.Value = sarama.StringEncoder("this is a test log")
-	// 连接kafka
-	client, err := sarama.NewSyncProducer([]string{"81.68.70.6:9092"}, config)
-	if err != nil {
-		fmt.Println("producer closed, err:", err)
-	}
-	// 发送消息
-	pid, offset, err := client.SendMessage(msg)
-	if err != nil {
-		fmt.Println("send msg failed, err:", err)
-	}
-	fmt.Printf("pid:%v offset:%v\n", pid, offset)
+	//// 连接kafka
+	//client, err := sarama.NewSyncProducer([]string{"81.68.70.6:9092"}, config)
+	//if err != nil {
+	//	fmt.Println("producer closed, err:", err)
+	//}
+	//// 发送消息
+	//pid, offset, err := client.SendMessage(msg)
+	//if err != nil {
+	//	fmt.Println("send msg failed, err:", err)
+	//}
+	//fmt.Printf("pid:%v offset:%v\n", pid, offset)
 
 
 	userServiceHandler.MySqlDB, err = mysql.NewMySqlConn(mysqlConfig)

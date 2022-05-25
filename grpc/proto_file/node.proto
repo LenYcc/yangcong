@@ -31,3 +31,37 @@ message Meta {
   string Code = 1;
   string Message = 2;
 }
+
+service RelationshipService{
+  rpc GetLike (LikeRequest) returns (LikeReply);
+  rpc GetDislike (DislikeRequest) returns (DislikeReply);
+  rpc GetAll (AllRequest) returns (AllReply);
+}
+
+message LikeRequest {
+  int32 UserId = 1;
+}
+
+message LikeReply {
+    map<int32, string> Ids = 1;
+    Meta Meta = 2;
+}
+
+
+message DislikeRequest {
+  int32 UserId = 1;
+}
+
+message DislikeReply {
+  map<int32, string> Ids = 1;
+  Meta Meta = 2;
+}
+
+message AllRequest {
+  int32 UserId = 1;
+}
+
+message AllReply {
+  map<int32, string> Ids = 1;
+  Meta Meta = 2;
+}

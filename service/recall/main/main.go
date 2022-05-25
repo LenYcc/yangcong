@@ -17,5 +17,5 @@ func main()  {
 	server := recall.NewRecallServiceHandler()
 	r := gin.Default()
 	r.POST("/search", server.Search)
-	r.Run("0.0.0.0:8080") // listen and serve on 0.0.0.0:8080
+	r.Run("0.0.0.0:8081") // listen and serve on 0.0.0.0:8080
 }

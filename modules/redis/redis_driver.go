@@ -14,7 +14,7 @@ import (
 )
 import "github.com/garyburd/redigo/redis"
 
-func NewRedisClient(config config.RedisConfig)(*redis.Conn) {
+func NewRedisClient(config config.RedisConfig)(redis.Conn) {
 	conn, err := redis.Dial(config.Type, config.Host + ":" + config.Port)
 	if err != nil {
 		fmt.Println("连接出错,", err)
@@ -28,5 +28,5 @@ func NewRedisClient(config config.RedisConfig)(*redis.Conn) {
 	//	fmt.Println("写入错误", err)
 	//	return
 	//}
-	return &conn
+	return conn
 }

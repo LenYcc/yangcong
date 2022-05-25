@@ -12,6 +12,7 @@ import (
 	"flag"
 	"fmt"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
 	"net/http"
@@ -24,7 +25,7 @@ func main() {
 	server := service.NewNodeServer()
 	go func() {
 		http.HandleFunc("/search", server.SearchHttp)
-		http.ListenAndServe("0.0.0.0:8001", nil)
+		http.ListenAndServe("0.0.0.0:8000", nil)
 	}()
 
 
@@ -36,5 +37,6 @@ func main() {
 	log.Println("端口监听成功：9000")
 	grpcServer := grpc.NewServer()
 	pb_file.RegisterNodeServiceServer(grpcServer, server)
+	reflection.Register(grpcServer)
 	grpcServer.Serve(lis)
 }

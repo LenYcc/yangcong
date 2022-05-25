@@ -31,5 +31,5 @@ func main() {
 	r.POST("/register", server.Register)
 	r.POST("/login", server.Login)
 	r.POST("/update", server.Update)
-	r.Run("0.0.0.0:8080") // listen and serve on 0.0.0.0:8080
+	r.Run("0.0.0.0:8083") // listen and serve on 0.0.0.0:8080
 }

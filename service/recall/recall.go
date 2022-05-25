@@ -23,17 +23,30 @@ import (
 type RecallServiceHandler struct {
 	NodeConn *grpc.ClientConn
 	NodeClient pb_file.NodeServiceClient
+
+	RelationshipConn *grpc.ClientConn
+	RelationshipClient pb_file.RelationshipServiceClient
 }
 
 func NewRecallServiceHandler () (*RecallServiceHandler) {
+	//召回 Grpc
 	recallServiceHandler := &RecallServiceHandler{}
-	conn, err := grpc.Dial("127.0.0.1:9000",grpc.WithInsecure())
+	conn2, err := grpc.Dial("127.0.0.1:9000",grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	recallServiceHandler.NodeConn = conn
-	client := pb_file.NewNodeServiceClient(conn)
-	recallServiceHandler.NodeClient = client
+	recallServiceHandler.NodeConn = conn2
+	recallServiceHandler.NodeClient = pb_file.NewNodeServiceClient(conn2)
+
+	//关系 Grpc
+	conn2, err = grpc.Dial("127.0.0.1:9001",grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	recallServiceHandler.RelationshipConn = conn2
+	recallServiceHandler.RelationshipClient = pb_file.NewRelationshipServiceClient(conn2)
+
+
 	return recallServiceHandler
 }
 
@@ -133,7 +146,7 @@ func (server RecallServiceHandler)Search(c *gin.Context) {
 				// 向右移一位，最低位舍弃
 				b >>= 1
 			}
-			scoreMap[user.UserId] = float64(countA / countB) + float64(0.5 * user.Pop)
+			scoreMap[user.UserId] = float64(countA / countB) + float64(0.1 * user.Pop)
 		}
 	}
 	sortByScore := SortByScore{
@@ -141,6 +154,25 @@ func (server RecallServiceHandler)Search(c *gin.Context) {
 		Users: reply.Users,
 	}
 	sort.Sort(sortByScore)
+
+	relationshipReply,err := server.RelationshipClient.GetAll(context.Background(), &pb_file.AllRequest{UserId: request.UserId})
+	if err != nil {
+		fmt.Errorf("Gey filter err %v", err)
+	}else{
+		fmt.Println(relationshipReply.Ids)
+		i := 0
+		for i < len(reply.Users) {
+			//
+			if _,in := relationshipReply.Ids[reply.Users[i].UserId];in {
+				fmt.Println("filter",reply.Users[i].UserId)
+				reply.Users = append(reply.Users[0:i], reply.Users[i+1:]...)
+				continue
+			}
+			i ++
+		}
+	}
+
+
 	c.String(http.StatusOK, "Me" + ":" + reply.Me.String() + "\n")
 
 	for _, user := range reply.Users {
